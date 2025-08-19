@@ -11,7 +11,10 @@ import { Badge } from "../components/ui/badge"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Textarea } from "../components/ui/textarea"
-import { Plus, Loader2, Edit, Trash2, Star, ArrowLeft, Search, X } from "lucide-react"
+import { Plus, Loader2, Edit, Trash2, Star, ArrowLeft, Search, X, ShoppingCart } from "lucide-react"
+import { useCart } from "../context/CartContext"
+import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 export function ProductList() {
   const [products, setProducts] = useState<Product[]>([])
@@ -22,7 +25,6 @@ export function ProductList() {
   const [formLoading, setFormLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
-  // Form state
   const [formData, setFormData] = useState<ProductFormData>({
     title: "",
     description: "",
@@ -31,6 +33,10 @@ export function ProductList() {
     category: "",
     stock: 0,
   })
+
+  const { userId } = useAuth()
+  const { addItem } = useCart()
+  const navigate = useNavigate()
 
   useEffect(() => {
     loadProducts()
@@ -130,6 +136,11 @@ export function ProductList() {
     } finally {
       setFormLoading(false)
     }
+  }
+
+  const handleAddToCart = async (productId: number) => {
+    if (!userId) return navigate("/login")
+    await addItem(productId, 1)
   }
 
   const handleDeleteProduct = async (id: number) => {
@@ -294,8 +305,8 @@ export function ProductList() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Products</h1>
-            <p className="text-gray-600">Manage your product inventory</p>
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Products</h1>
+            <p className="text-muted-foreground">Manage your product inventory</p>
           </div>
           <Button onClick={handleAddProduct}>
             <Plus className="w-4 h-4 mr-2" />
@@ -346,7 +357,7 @@ export function ProductList() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
             {filteredProducts.map((product) => {
               if (!product) return null
 
@@ -366,20 +377,25 @@ export function ProductList() {
               const discountedPrice = price - (price * discountPercentage) / 100
 
               return (
-                <Card key={id} className="h-full flex flex-col hover:shadow-lg transition-shadow">
-                  <div className="aspect-square overflow-hidden rounded-t-lg">
+                <Card key={id} className="group h-full flex flex-col overflow-hidden hover:shadow-xl transition-all border-border/60 bg-card/60 backdrop-blur-xl">
+                  <div className="relative aspect-[4/3] overflow-hidden">
                     <img
                       src={thumbnail || "/placeholder.svg?height=300&width=300&query=product"}
                       alt={title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.src = "/placeholder.svg?height=300&width=300"
                       }}
                     />
+                    {discountPercentage > 0 && (
+                      <div className="absolute left-3 top-3 rounded-full bg-destructive/90 px-3 py-1 text-xs font-semibold text-destructive-foreground shadow">
+                        -{discountPercentage.toFixed(0)}%
+                      </div>
+                    )}
                   </div>
 
-                  <CardContent className="flex-1 p-4">
+                  <CardContent className="flex-1 p-4 pb-2">
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="font-semibold text-lg line-clamp-2 leading-tight">{title}</h3>
@@ -406,11 +422,6 @@ export function ProductList() {
                               <span className="text-sm text-muted-foreground line-through">${price.toFixed(2)}</span>
                             )}
                           </div>
-                          {discountPercentage > 0 && (
-                            <Badge variant="destructive" className="text-xs">
-                              -{discountPercentage.toFixed(0)}%
-                            </Badge>
-                          )}
                         </div>
                         <div className="text-right">
                           <p className="text-sm text-muted-foreground">Stock</p>
@@ -422,14 +433,18 @@ export function ProductList() {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-4 pt-0 flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)} className="flex-1">
+                  <CardFooter className="p-3 sm:p-4 pt-0 flex flex-wrap gap-2 border-t bg-background/40">
+                    <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)} className="flex-1 sm:flex-none sm:min-w-[90px] hover:shadow"> 
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(id)} className="flex-1">
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(id)} className="flex-1 sm:flex-none sm:min-w-[90px] hover:shadow">
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete
+                    </Button>
+                    <Button size="sm" onClick={() => handleAddToCart(id)} className="flex-1 sm:flex-none sm:min-w-[110px] hover:shadow bg-gradient-to-r from-primary to-secondary text-primary-foreground">
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Add
                     </Button>
                   </CardFooter>
                 </Card>

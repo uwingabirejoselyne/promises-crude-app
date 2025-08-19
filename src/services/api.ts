@@ -1,5 +1,6 @@
 import axios from "axios"
 import type { Product, ProductFormData } from "../types/product"
+import type { CartResponse, UserCartsResponse } from "../types/cart"
 
 const API_BASE_URL = "https://dummyjson.com"
 
@@ -8,9 +9,8 @@ const api = axios.create({
   timeout: 10000,
 })
 
-// Local storage helpers
 const STORAGE_KEY = "products_cache"
-const CACHE_EXPIRY = 5 * 60 * 1000 // 5 minutes
+const CACHE_EXPIRY = 5 * 60 * 1000 
 
 interface CachedData {
   products: Product[]
@@ -69,13 +69,11 @@ const addProductToCache = (newProduct: Product) => {
 
 export const productApi = {
   async getAllProducts(): Promise<Product[]> {
-    // Try cache first
     const cached = loadFromCache()
     if (cached) {
       return cached
     }
 
-    // Fetch from API
     const response = await api.get("/products")
     const products = response.data.products
     saveToCache(products)
@@ -105,5 +103,43 @@ export const productApi = {
     await api.delete(`/products/${id}`)
     removeProductFromCache(id)
     return true
+  },
+}
+
+export const cartApi = {
+  async getAllCarts(): Promise<UserCartsResponse> {
+    const response = await api.get(`/carts`)
+    return response.data
+  },
+
+  async getCart(cartId: number): Promise<CartResponse> {
+    const response = await api.get(`/carts/${cartId}`)
+    return response.data
+  },
+
+  async getUserCarts(userId: number): Promise<UserCartsResponse> {
+    const response = await api.get(`/carts/user/${userId}`)
+    return response.data
+  },
+
+  async addToCart(userId: number, products: { id: number; quantity: number }[]): Promise<CartResponse> {
+    const response = await api.post(`/carts/add`, {
+      userId,
+      products,
+    })
+    return response.data
+  },
+
+  async updateCart(cartId: number, products: { id: number; quantity: number }[], merge = true): Promise<CartResponse> {
+    const response = await api.put(`/carts/${cartId}`, {
+      merge,
+      products,
+    })
+    return response.data
+  },
+
+  async deleteCart(cartId: number): Promise<{ isDeleted: boolean; deletedOn: string } | CartResponse> {
+    const response = await api.delete(`/carts/${cartId}`)
+    return response.data
   },
 }
