@@ -7,14 +7,14 @@ import { Navigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
 export default function CartPage() {
-  const { userId } = useAuth()
+  const { user } = useAuth()
   const { cart, loading, refresh, clearCart, addItem } = useCart()
 
   useEffect(() => {
     void refresh()
   }, [refresh])
 
-  if (!userId) return <Navigate to="/login" replace />
+  if (!user?.id) return <Navigate to="/login" replace />
 
   return (
     <div className="container mx-auto px-4 py-8">

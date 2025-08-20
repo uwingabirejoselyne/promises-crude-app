@@ -8,7 +8,8 @@ import { useAuth } from "../context/AuthContext"
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
-  const { userId } = useAuth()
+  const auth = useAuth()
+  const userId = (auth as any).userId
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-background via-background to-background">

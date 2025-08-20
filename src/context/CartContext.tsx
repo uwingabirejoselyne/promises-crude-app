@@ -14,7 +14,8 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const { userId } = useAuth()
+  const { user } = useAuth()
+  const userId = user?.id ?? null
   const [cart, setCart] = useState<CartResponse | null>(null)
   const [loading, setLoading] = useState(false)
 

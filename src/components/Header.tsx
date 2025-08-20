@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export function Header({ onToggleSidebar, onSearch }: HeaderProps) {
-  const { userId, logout } = useAuth()
+  const { user, logout } = useAuth()
   const { cart } = useCart()
   const navigate = useNavigate()
 
@@ -53,9 +53,9 @@ export function Header({ onToggleSidebar, onSearch }: HeaderProps) {
             ) : null}
           </Link>
 
-          {userId ? (
+          {user?.id ? (
             <div className="flex items-center gap-2">
-              <div className="inline-flex items-center gap-1 text-sm"><User className="w-4 h-4" />{userId}</div>
+              <div className="inline-flex items-center gap-1 text-sm"><User className="w-4 h-4" />{user.firstname}</div>
               <Button variant="outline" size="sm" onClick={handleLogout} className="hover:shadow">
                 <LogOut className="w-4 h-4 mr-1" /> Logout
               </Button>

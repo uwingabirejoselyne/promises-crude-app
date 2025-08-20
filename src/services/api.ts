@@ -122,10 +122,26 @@ export const cartApi = {
     return response.data
   },
 
-  async addToCart(userId: number, products: { id: number; quantity: number }[]): Promise<CartResponse> {
+  async addToCart(
+    userId: number,
+    products: Array<{ id?: number; productId?: number; quantity: number }>,
+  ): Promise<CartResponse> {
+    const normalized = products.map((p) => ({ id: p.id ?? p.productId, quantity: p.quantity }))
     const response = await api.post(`/carts/add`, {
       userId,
-      products,
+      products: normalized,
+    })
+    return response.data
+  },
+
+  async addMultipleToCart(
+    userId: number,
+    products: Array<{ productId: number; quantity: number }>,
+  ): Promise<CartResponse> {
+    const normalized = products.map((p) => ({ id: p.productId, quantity: p.quantity }))
+    const response = await api.post(`/carts/add`, {
+      userId,
+      products: normalized,
     })
     return response.data
   },

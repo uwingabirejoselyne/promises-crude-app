@@ -34,7 +34,7 @@ export function ProductList() {
     stock: 0,
   })
 
-  const { userId } = useAuth()
+  const { user } = useAuth()
   const { addItem } = useCart()
   const navigate = useNavigate()
 
@@ -139,7 +139,7 @@ export function ProductList() {
   }
 
   const handleAddToCart = async (productId: number) => {
-    if (!userId) return navigate("/login")
+    if (!user?.id) return navigate("/login")
     await addItem(productId, 1)
   }
 
