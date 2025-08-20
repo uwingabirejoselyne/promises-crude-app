@@ -11,7 +11,7 @@ interface SidebarProps {
 export function Sidebar({ open, onClose, onAddProduct }: SidebarProps) {
   return (
     <aside
-  className={`fixed left-0 z-50 w-0 transform border-r bg-background/60 backdrop-blur-xl p-2.5 transition-transform duration-200 ease-in-out pt-14 ${
+  className={`hidden md:block fixed left-0 z-50 w-0 transform border-r bg-background/60 backdrop-blur-xl p-2.5 transition-transform duration-200 ease-in-out pt-14 ${
     open ? "translate-x-0" : "-translate-x-full"
   } sm:translate-x-0 sm:static sm:w-40 sm:pt-14 sm:fixed sm:inset-y-0`}
   style={{ top: 10, bottom: 20 }}

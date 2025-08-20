@@ -1,3 +1,4 @@
+// types/cart.ts
 export interface CartProduct {
   id: number
   title?: string
@@ -26,4 +27,18 @@ export interface UserCartsResponse {
   limit?: number
 }
 
+// Additional interfaces for cart operations
+export interface AddToCartRequest {
+  id: number
+  quantity: number
+}
 
+export interface CartApiResponse {
+  id: number
+  products: CartProduct[]
+  total: number
+  discountedTotal: number
+  userId: number
+  totalProducts: number
+  totalQuantity: number
+}

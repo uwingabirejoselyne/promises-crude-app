@@ -45,6 +45,7 @@ export function CartDrawer({ open, onClose, userId }: CartDrawerProps) {
   }
 
   const totalAmount = cart?.total ?? 0
+  const totalQty = cart?.totalQuantity ?? cart?.products.reduce((sum, p) => sum + (p.quantity || 0), 0) ?? 0
 
   return (
     <div
@@ -102,7 +103,10 @@ export function CartDrawer({ open, onClose, userId }: CartDrawerProps) {
 
             <Card className="bg-card/70 backdrop-blur">
               <CardContent className="flex items-center justify-between py-4">
-                <div className="font-semibold">Grand Total</div>
+                <div>
+                  <div className="font-semibold">Grand Total</div>
+                  <div className="text-sm text-muted-foreground">Items: {totalQty}</div>
+                </div>
                 <div className="text-lg font-bold">${totalAmount.toFixed(2)}</div>
               </CardContent>
               <CardFooter className="flex gap-2">

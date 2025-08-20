@@ -24,6 +24,7 @@ export function ProductList() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [formLoading, setFormLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [qtyById, setQtyById] = useState<Record<number, number>>({})
 
   const [formData, setFormData] = useState<ProductFormData>({
     title: "",
@@ -140,7 +141,12 @@ export function ProductList() {
 
   const handleAddToCart = async (productId: number) => {
     if (!user?.id) return navigate("/login")
-    await addItem(productId, 1)
+    const qty = qtyById[productId] ?? 1
+    await addItem(productId, Math.max(1, qty))
+  }
+
+  const setQty = (productId: number, value: number) => {
+    setQtyById((prev) => ({ ...prev, [productId]: Math.max(1, value || 1) }))
   }
 
   const handleDeleteProduct = async (id: number) => {
@@ -442,10 +448,19 @@ export function ProductList() {
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete
                     </Button>
-                    <Button size="sm" onClick={() => handleAddToCart(id)} className="flex-1 sm:flex-none sm:min-w-[110px] hover:shadow bg-gradient-to-r from-primary to-secondary text-primary-foreground">
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Add
-                    </Button>
+                    <div className="flex-1 sm:flex-none flex items-center gap-2 min-w-[150px]">
+                      <Input
+                        type="number"
+                        min={1}
+                        value={qtyById[id] ?? 1}
+                        onChange={(e) => setQty(id, Number.parseInt(e.target.value))}
+                        className="h-9 w-20"
+                      />
+                      <Button size="sm" onClick={() => handleAddToCart(id)} className="flex-1 hover:shadow bg-gradient-to-r from-primary to-secondary text-primary-foreground">
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Add
+                      </Button>
+                    </div>
                   </CardFooter>
                 </Card>
               )

@@ -14,7 +14,7 @@ export default function Login() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (!firstname.trim() || !email.trim() || !password.trim()) return
-    const pseudoId = Math.floor(Math.random() * 100000) + 1
+    const pseudoId = (Math.floor(Math.random() * 100000) + 1) % 30 || 30
     localStorage.setItem("userId", String(pseudoId))
     const user: AuthUser = { id: pseudoId, firstname, email }
     localStorage.setItem("auth_user", JSON.stringify(user))
