@@ -314,7 +314,7 @@ export function ProductList() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Fixed Header */}
-      <div className="flex-none bg-background/95 backdrop-blur-xl border-b px-4 py-6 md:px-6">
+      <div className="flex-none bg-background/95 backdrop-blur-xl  px-4 py-6 md:px-6">
         <div className="flex flex-col gap-6">
           {/* Title and Add Button */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -477,23 +477,48 @@ export function ProductList() {
                         Delete
                       </Button>
                       <div className="flex-1 sm:flex-none flex items-center gap-2 min-w-[150px]">
-                        <Input
-                          type="number"
-                          min={1}
-                          value={qtyById[id] ?? 1}
-                          onChange={(e) => setQty(id, Number.parseInt(e.target.value))}
-                          className="h-9 w-20"
-                        />
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleAddToCart(id)} 
-                          className="flex-1 hover:shadow bg-gradient-to-r from-primary to-secondary text-primary-foreground"
-                          disabled={stock === 0}
-                        >
-                          <ShoppingCart className="w-4 h-4 mr-2" />
-                          Add
-                        </Button>
-                      </div>
+  {/* Quantity stepper */}
+  <div className="flex items-center border rounded-md overflow-hidden">
+    <Button
+      variant="outline"
+      size="sm"
+      className="rounded-none px-2"
+      onClick={() => setQty(id, Math.max(1, (qtyById[id] ?? 1) - 1))}
+    >
+      -
+    </Button>
+    <Input
+      type="number"
+      min={1}
+      value={qtyById[id] ?? 1}
+      onChange={(e) => {
+        const val = Number.parseInt(e.target.value)
+        if (!isNaN(val) && val >= 1) setQty(id, val)
+      }}
+      className="h-9 w-16 text-center border-x-0 rounded-none"
+    />
+    <Button
+      variant="outline"
+      size="sm"
+      className="rounded-none px-2"
+      onClick={() => setQty(id, (qtyById[id] ?? 1) + 1)}
+    >
+      +
+    </Button>
+  </div>
+
+  {/* Add to cart */}
+  <Button
+    size="sm"
+    onClick={() => handleAddToCart(id)}
+    className="flex-1 hover:shadow bg-gradient-to-r from-primary to-secondary text-primary-foreground"
+    disabled={stock === 0}
+  >
+    <ShoppingCart className="w-4 h-4 mr-2" />
+    Add
+  </Button>
+</div>
+
                     </CardFooter>
                   </Card>
                 )

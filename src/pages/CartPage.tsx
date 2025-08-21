@@ -100,6 +100,7 @@ export default function CartPage() {
                   <div className="flex items-center gap-6">
                     {/* Product Image */}
                     <div className="w-24 h-24 flex-shrink-0">
+                      
                       <img
                         src={product.thumbnail || "/placeholder.svg?height=96&width=96"}
                         alt={product.title ?? "Product"}

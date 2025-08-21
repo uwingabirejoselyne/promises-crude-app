@@ -20,7 +20,7 @@ export function Sidebar({ open, onClose, onAddProduct }: SidebarProps) {
       {/* Mobile backdrop */}
       {open && (
         <div 
-          className="fixed inset-0 z-40 bg-black/50 md:hidden" 
+          className="sticky inset-0 z-40 bg-black/50 md:hidden" 
           onClick={onClose}
         />
       )}
@@ -28,7 +28,7 @@ export function Sidebar({ open, onClose, onAddProduct }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed left-0 top-0 z-50 h-full w-64 transform border-r bg-background/95 backdrop-blur-xl 
+          sticky left-0 top-0 z-50 h-full w-64 transform  bg-background/95 backdrop-blur-xl 
           transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0 md:static md:w-64
@@ -36,7 +36,7 @@ export function Sidebar({ open, onClose, onAddProduct }: SidebarProps) {
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between border-b px-4 py-4">
+          <div className="flex items-center justify-between  px-4 py-4">
             <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Product UI
             </h2>
