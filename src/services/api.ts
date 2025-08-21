@@ -80,6 +80,22 @@ export const productApi = {
     return products
   },
 
+  // ADDED: Method to get a single product by ID
+  async getProduct(id: number): Promise<Product> {
+    // First try to get from cache
+    const cached = loadFromCache()
+    if (cached) {
+      const cachedProduct = cached.find(p => p.id === id)
+      if (cachedProduct) {
+        return cachedProduct
+      }
+    }
+
+    // If not in cache, fetch from API
+    const response = await api.get(`/products/${id}`)
+    return response.data
+  },
+
   async searchProducts(query: string): Promise<Product[]> {
     const response = await api.get(`/products/search?q=${encodeURIComponent(query)}`)
     return response.data.products

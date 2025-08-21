@@ -1,7 +1,9 @@
-// context/CartContext.tsx with localStorage persistence
+// context/CartContext.tsx with localStorage persistence - FIXED
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import type { CartResponse } from "../types/cart"
-import { cartApi } from "../services/api"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Product } from "../types/product"
+import { cartApi, productApi } from "../services/api"
 import { useAuth } from "./AuthContext"
 
 interface CartContextValue {
@@ -95,6 +97,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     saveCartsToStorage(updatedCarts)
   }, [])
 
+  // FIXED: Proper product fetching in addItem function
   const addItem = useCallback(
     async (productId: number, quantity = 1) => {
       if (!userId) {
@@ -106,8 +109,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         let updatedCart: CartResponse
 
+        // FIXED: Fetch individual product details (more efficient)
+        const product = await productApi.getProduct(productId)
+        
+        if (!product) {
+          throw new Error(`Product with ID ${productId} not found`)
+        }
+
         if (cart) {
-          // Update existing cart
           const existingItem = cart.products.find(p => p.id === productId)
           
           if (existingItem) {
@@ -130,14 +139,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               totalQuantity: updatedProducts.reduce((sum, p) => sum + p.quantity, 0)
             }
           } else {
-            // Add new item to existing cart
+            // Add new item with real product data
             const newProduct = {
-              id: productId,
+              id: product.id,
               quantity,
-              title: `Product ${productId}`,
-              price: 10, // Default price - you'd get this from your product data
-              total: 10 * quantity,
-              thumbnail: "/placeholder.svg"
+              title: product.title,
+              price: product.price,
+              total: product.price * quantity,
+              thumbnail: product.thumbnail,
+              discountPercentage: product.discountPercentage || 0,
+              discountedPrice: product.discountedPrice || product.price
             }
             
             updatedCart = {
@@ -149,23 +160,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             }
           }
         } else {
-          // Create new cart
+          // Create new cart with real product data
           const newProduct = {
-            id: productId,
+            id: product.id,
             quantity,
-            title: `Product ${productId}`,
-            price: 10,
-            total: 10 * quantity,
-            thumbnail: "/placeholder.svg"
+            title: product.title,
+            price: product.price,
+            total: product.price * quantity,
+            thumbnail: product.thumbnail,
+            discountPercentage: product.discountPercentage || 0,
+            discountedPrice: product.discountedPrice || product.price
           }
           
           updatedCart = {
-            id: Date.now(), // Simple ID generation
+            id: Date.now(), // Generate unique cart ID
             userId: userId,
             products: [newProduct],
             total: newProduct.total,
             totalProducts: 1,
-            totalQuantity: quantity
+            totalQuantity: quantity,
+            // Remove these fields as they don't belong to CartResponse
+            // title: product.title,
+            // price: product.price,
+            // thumbnail: product.thumbnail
           }
         }
         
@@ -266,7 +283,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart])
 
-  // New function to get all user carts for AllCarts page
+  // Get all user carts for AllCarts page
   const getAllUserCarts = useCallback(() => {
     return loadCartsFromStorage()
   }, [])
