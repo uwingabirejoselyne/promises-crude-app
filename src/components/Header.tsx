@@ -24,7 +24,7 @@ export function Header({ onToggleSidebar, onSearch }: HeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/40">
+    <header className="sticky top-0 z-30  bg-green-600 shadow-md backdrop-blur-xl supports-[backdrop-filter]:bg-background/40">
       <div className="container mx-auto max-w-[1400px] px-3 py-2 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onToggleSidebar} aria-label="Toggle sidebar" className="sm:hidden">
           <Menu className="w-5 h-5" />

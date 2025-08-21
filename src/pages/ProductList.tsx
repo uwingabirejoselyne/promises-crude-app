@@ -1,7 +1,4 @@
-
-
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import type { Product, ProductFormData } from "../types/product"
 import { productApi } from "../services/api"
@@ -172,6 +169,7 @@ export function ProductList() {
     }))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     handleSearch(searchQuery.trim())
@@ -179,294 +177,330 @@ export function ProductList() {
 
   if (showForm) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setShowForm(false)
-                setEditingProduct(null)
-              }}
-              className="mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Products
-            </Button>
-            <h1 className="text-3xl font-bold">{editingProduct ? "Edit Product" : "Add New Product"}</h1>
+      <div className="fixed inset-0 bg-background overflow-auto">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setShowForm(false)
+                  setEditingProduct(null)
+                }}
+                className="mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Products
+              </Button>
+              <h1 className="text-3xl font-bold">{editingProduct ? "Edit Product" : "Add New Product"}</h1>
+            </div>
+
+            <Card className="shadow-xl">
+              <CardHeader>
+                <CardTitle>Product Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Product Title *</Label>
+                      <Input
+                        id="title"
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => handleFormChange("title", e.target.value)}
+                        placeholder="Enter product title"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="brand">Brand *</Label>
+                      <Input
+                        id="brand"
+                        type="text"
+                        value={formData.brand}
+                        onChange={(e) => handleFormChange("brand", e.target.value)}
+                        placeholder="Enter brand name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description *</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => handleFormChange("description", e.target.value)}
+                      placeholder="Enter product description"
+                      rows={4}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="price">Price ($) *</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={formData.price}
+                        onChange={(e) => handleFormChange("price", Number.parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Category *</Label>
+                      <Input
+                        id="category"
+                        type="text"
+                        value={formData.category}
+                        onChange={(e) => handleFormChange("category", e.target.value)}
+                        placeholder="Enter category"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="stock">Stock Quantity *</Label>
+                      <Input
+                        id="stock"
+                        type="number"
+                        min="0"
+                        value={formData.stock}
+                        onChange={(e) => handleFormChange("stock", Number.parseInt(e.target.value) || 0)}
+                        placeholder="0"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <Button 
+                      type="button" 
+                      disabled={formLoading} 
+                      className="flex-1"
+                      onClick={handleFormSubmit}
+                    >
+                      {formLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      {editingProduct ? "Update Product" : "Add Product"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowForm(false)
+                        setEditingProduct(null)
+                      }}
+                      disabled={formLoading}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleFormSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Product Title *</Label>
-                    <Input
-                      id="title"
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => handleFormChange("title", e.target.value)}
-                      placeholder="Enter product title"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="brand">Brand *</Label>
-                    <Input
-                      id="brand"
-                      type="text"
-                      value={formData.brand}
-                      onChange={(e) => handleFormChange("brand", e.target.value)}
-                      placeholder="Enter brand name"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleFormChange("description", e.target.value)}
-                    placeholder="Enter product description"
-                    rows={4}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="price">Price ($) *</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => handleFormChange("price", Number.parseFloat(e.target.value) || 0)}
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Category *</Label>
-                    <Input
-                      id="category"
-                      type="text"
-                      value={formData.category}
-                      onChange={(e) => handleFormChange("category", e.target.value)}
-                      placeholder="Enter category"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="stock">Stock Quantity *</Label>
-                    <Input
-                      id="stock"
-                      type="number"
-                      min="0"
-                      value={formData.stock}
-                      onChange={(e) => handleFormChange("stock", Number.parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pt-4">
-                  <Button type="submit" disabled={formLoading} className="flex-1">
-                    {formLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    {editingProduct ? "Update Product" : "Add Product"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowForm(false)
-                      setEditingProduct(null)
-                    }}
-                    disabled={formLoading}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Products</h1>
-            <p className="text-muted-foreground">Manage your product inventory</p>
+    <div className="h-screen flex flex-col overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-none bg-background/95 backdrop-blur-xl border-b px-4 py-6 md:px-6">
+        <div className="flex flex-col gap-6">
+          {/* Title and Add Button */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                Products
+              </h1>
+              <p className="text-muted-foreground">Manage your product inventory</p>
+            </div>
+            <Button onClick={handleAddProduct} className="shrink-0">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Product
+            </Button>
           </div>
-          <Button onClick={handleAddProduct}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </Button>
+
+          {/* Search Bar */}
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                type="text"
+                placeholder="Search products by name, brand, or category..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-10"
+              />
+              {searchQuery && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearSearch}
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+            <Button type="button" onClick={() => handleSearch(searchQuery.trim())}>
+              Search
+            </Button>
+          </div>
         </div>
+      </div>
 
-        <form onSubmit={handleSearchSubmit} className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              type="text"
-              placeholder="Search products by name, brand, or category..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10"
-            />
-            {searchQuery && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleClearSearch}
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-          <Button type="submit">Search</Button>
-        </form>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 md:p-6">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin" />
+              <span className="ml-2">Loading products...</span>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-gray-600 mb-4">
+                {searchQuery ? "No products found matching your search." : "No products available."}
+              </p>
+              {!searchQuery && (
+                <Button onClick={handleAddProduct}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Your First Product
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
+              {filteredProducts.map((product) => {
+                if (!product) return null
 
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin" />
-            <span className="ml-2">Loading products...</span>
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">
-              {searchQuery ? "No products found matching your search." : "No products available."}
-            </p>
-            {!searchQuery && (
-              <Button onClick={handleAddProduct} className="mt-4">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Your First Product
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-            {filteredProducts.map((product) => {
-              if (!product) return null
+                const {
+                  id,
+                  title = "Untitled Product",
+                  description = "No description available",
+                  price = 0,
+                  discountPercentage = 0,
+                  rating = 0,
+                  stock = 0,
+                  brand = "Unknown Brand",
+                  category = "Uncategorized",
+                  thumbnail,
+                } = product
 
-              const {
-                id,
-                title = "Untitled Product",
-                description = "No description available",
-                price = 0,
-                discountPercentage = 0,
-                rating = 0,
-                stock = 0,
-                brand = "Unknown Brand",
-                category = "Uncategorized",
-                thumbnail,
-              } = product
+                const discountedPrice = price - (price * discountPercentage) / 100
 
-              const discountedPrice = price - (price * discountPercentage) / 100
-
-              return (
-                <Card key={id} className="group h-full flex flex-col overflow-hidden hover:shadow-xl transition-all border-border/60 bg-card/60 backdrop-blur-xl">
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img
-                      src={thumbnail || "/placeholder.svg?height=300&width=300&query=product"}
-                      alt={title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement
-                        target.src = "/placeholder.svg?height=300&width=300"
-                      }}
-                    />
-                    {discountPercentage > 0 && (
-                      <div className="absolute left-3 top-3 rounded-full bg-destructive/90 px-3 py-1 text-xs font-semibold text-destructive-foreground shadow">
-                        -{discountPercentage.toFixed(0)}%
-                      </div>
-                    )}
-                  </div>
-
-                  <CardContent className="flex-1 p-4 pb-2">
-                    <div className="space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-semibold text-lg line-clamp-2 leading-tight">{title}</h3>
-                        <Badge variant="secondary" className="shrink-0">
-                          {category}
-                        </Badge>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
-
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{brand}</span>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm">{rating.toFixed(1)}</span>
+                return (
+                  <Card key={id} className="group h-full flex flex-col overflow-hidden hover:shadow-xl transition-all border-border/60 bg-card/80 backdrop-blur-xl">
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <img
+                        src={thumbnail || "/placeholder.svg?height=300&width=300&query=product"}
+                        alt={title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.src = "/placeholder.svg?height=300&width=300"
+                        }}
+                      />
+                      {discountPercentage > 0 && (
+                        <div className="absolute left-3 top-3 rounded-full bg-destructive/90 px-3 py-1 text-xs font-semibold text-destructive-foreground shadow">
+                          -{discountPercentage.toFixed(0)}%
                         </div>
-                      </div>
+                      )}
+                    </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold">${discountedPrice.toFixed(2)}</span>
-                            {discountPercentage > 0 && (
-                              <span className="text-sm text-muted-foreground line-through">${price.toFixed(2)}</span>
-                            )}
+                    <CardContent className="flex-1 p-4 pb-2">
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="font-semibold text-lg line-clamp-2 leading-tight">{title}</h3>
+                          <Badge variant="secondary" className="shrink-0">
+                            {category}
+                          </Badge>
+                        </div>
+
+                        <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">{brand}</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm">{rating.toFixed(1)}</span>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Stock</p>
-                          <p className={`text-sm font-medium ${stock > 0 ? "text-green-600" : "text-red-600"}`}>
-                            {stock > 0 ? `${stock} left` : "Out of stock"}
-                          </p>
+
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xl font-bold">${discountedPrice.toFixed(2)}</span>
+                              {discountPercentage > 0 && (
+                                <span className="text-sm text-muted-foreground line-through">${price.toFixed(2)}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-muted-foreground">Stock</p>
+                            <p className={`text-sm font-medium ${stock > 0 ? "text-green-600" : "text-red-600"}`}>
+                              {stock > 0 ? `${stock} left` : "Out of stock"}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
+                    </CardContent>
 
-                  <CardFooter className="p-3 sm:p-4 pt-0 flex flex-wrap gap-2 border-t bg-background/40">
-                    <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)} className="flex-1 sm:flex-none sm:min-w-[90px] hover:shadow"> 
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(id)} className="flex-1 sm:flex-none sm:min-w-[90px] hover:shadow">
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete
-                    </Button>
-                    <div className="flex-1 sm:flex-none flex items-center gap-2 min-w-[150px]">
-                      <Input
-                        type="number"
-                        min={1}
-                        value={qtyById[id] ?? 1}
-                        onChange={(e) => setQty(id, Number.parseInt(e.target.value))}
-                        className="h-9 w-20"
-                      />
-                      <Button size="sm" onClick={() => handleAddToCart(id)} className="flex-1 hover:shadow bg-gradient-to-r from-primary to-secondary text-primary-foreground">
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add
+                    <CardFooter className="p-3 md:p-4 pt-0 flex flex-wrap gap-2 border-t bg-background/60">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleEditProduct(product)} 
+                        className="flex-1 sm:flex-none sm:min-w-[90px] hover:shadow"
+                      > 
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit
                       </Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-              )
-            })}
-          </div>
-        )}
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => handleDeleteProduct(id)} 
+                        className="flex-1 sm:flex-none sm:min-w-[90px] hover:shadow"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete
+                      </Button>
+                      <div className="flex-1 sm:flex-none flex items-center gap-2 min-w-[150px]">
+                        <Input
+                          type="number"
+                          min={1}
+                          value={qtyById[id] ?? 1}
+                          onChange={(e) => setQty(id, Number.parseInt(e.target.value))}
+                          className="h-9 w-20"
+                        />
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleAddToCart(id)} 
+                          className="flex-1 hover:shadow bg-gradient-to-r from-primary to-secondary text-primary-foreground"
+                          disabled={stock === 0}
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Add
+                        </Button>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
