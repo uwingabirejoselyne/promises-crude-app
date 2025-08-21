@@ -1,7 +1,7 @@
-// context/CartContext.tsx with localStorage persistence - FIXED
+// context/CartContext.tsx with localStorage persistence
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import type { CartResponse } from "../types/cart"
-import { cartApi, productApi } from "../services/api"
+import { cartApi } from "../services/api"
 import { useAuth } from "./AuthContext"
 
 interface CartContextValue {
@@ -95,7 +95,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     saveCartsToStorage(updatedCarts)
   }, [])
 
-  // FIXED: Proper product fetching in addItem function
   const addItem = useCallback(
     async (productId: number, quantity = 1) => {
       if (!userId) {
@@ -107,14 +106,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         let updatedCart: CartResponse
 
-        // FIXED: Fetch individual product details (more efficient)
-        const product = await productApi.getProduct(productId)
-        
-        if (!product) {
-          throw new Error(`Product with ID ${productId} not found`)
-        }
-
         if (cart) {
+          // Update existing cart
           const existingItem = cart.products.find(p => p.id === productId)
           
           if (existingItem) {
@@ -137,16 +130,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               totalQuantity: updatedProducts.reduce((sum, p) => sum + p.quantity, 0)
             }
           } else {
-            // Add new item with real product data
+            // Add new item to existing cart
             const newProduct = {
-              id: product.id,
+              id: productId,
               quantity,
-              title: product.title,
-              price: product.price,
-              total: product.price * quantity,
-              thumbnail: product.thumbnail,
-              discountPercentage: product.discountPercentage || 0,
-              discountedPrice: product.discountedPrice || product.price
+              title: `Product ${productId}`,
+              price: 10, // Default price - you'd get this from your product data
+              total: 10 * quantity,
+              thumbnail: "/placeholder.svg"
             }
             
             updatedCart = {
@@ -158,28 +149,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             }
           }
         } else {
-          // Create new cart with real product data
+          // Create new cart
           const newProduct = {
-            id: product.id,
+            id: productId,
             quantity,
-            title: product.title,
-            price: product.price,
-            total: product.price * quantity,
-            thumbnail: product.thumbnail,
-            discountPercentage: product.discountPercentage || 0,
-            discountedPrice: product.discountedPrice || product.price
+            title: `Product ${productId}`,
+            price: 10,
+            total: 10 * quantity,
+            thumbnail: "/placeholder.svg"
           }
           
           updatedCart = {
-            id: Date.now(), // Generate unique cart ID
+            id: Date.now(), // Simple ID generation
             userId: userId,
             products: [newProduct],
             total: newProduct.total,
             totalProducts: 1,
-            totalQuantity: quantity,
-            title: product.title,
-            price: product.price,
-            thumbnail: product.thumbnail
+            totalQuantity: quantity
           }
         }
         
@@ -280,7 +266,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart])
 
-  // Get all user carts for AllCarts page
+  // New function to get all user carts for AllCarts page
   const getAllUserCarts = useCallback(() => {
     return loadCartsFromStorage()
   }, [])
